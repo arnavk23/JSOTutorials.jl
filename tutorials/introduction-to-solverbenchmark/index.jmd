@@ -239,3 +239,7 @@ end
 solvers = Dict(:newton => newton)
 problems = [NLPModelsTest.BROWNDEN()]
 stats = bmark_solvers(solvers, problems)
+
+# Access the solver-specific column `:isConvex` for the `:newton` solver
+df_newton = stats[:newton]
+df_newton.isConvex
