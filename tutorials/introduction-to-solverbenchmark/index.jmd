@@ -222,6 +222,28 @@ Here is a useful tutorial on how to use the benchmark with specific solver:
 [Run a benchmark with OptimizationProblems](https://jso.dev/OptimizationProblems.jl/dev/benchmark/)
 The tutorial covers how to use the problems from `OptimizationProblems` to run a benchmark for unconstrained optimization.
 
+### Displaying benchmark logs
+
+`SolverBenchmark` prints one row per problem with `@info log_row(...)`.
+In environments where logs are filtered, these messages may not appear by default.
+To force `Info` messages to be displayed, run `bmark_solvers` with an explicit logger:
+
+```julia
+using Logging, NLPModelsTest, SolverCore, SolverBenchmark
+
+function newton_logger_demo(nlp)
+  stats = GenericExecutionStats(nlp)
+  return stats
+end
+
+solvers = Dict(:newton => newton_logger_demo)
+problems = [NLPModelsTest.BROWNDEN()]
+
+with_logger(ConsoleLogger(stderr, Logging.Info)) do
+  stats = bmark_solvers(solvers, problems)
+end
+```
+
 ### Handling `solver_specific` in `stats`
 
 If a solver's `GenericExecutionStats` contains a `solver_specific` dictionary, then when `bmark_solvers` processes the results it creates a column in the per-solver `DataFrame` for each key in that dictionary. These columns can then be analyzed and compared alongside the standard metrics such as `status` and `elapsed_time`.
