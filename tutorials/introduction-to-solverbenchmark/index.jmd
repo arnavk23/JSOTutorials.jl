@@ -228,19 +228,12 @@ If a solver's `GenericExecutionStats` contains a `solver_specific` dictionary, t
 
 Here is an example showing how to set a solver-specific flag so that it appears as a column in the resulting stats table and can be used for tabulation:
 ```julia
-using NLPModelsTest, DataFrames, SolverCore, SolverBenchmark
+using ADNLPModels, SolverCore
 
-function newton(nlp)
-  stats = GenericExecutionStats(nlp)
-  set_solver_specific!(stats, :isConvex, true)
-  return stats
-end
+nlp = ADNLPModel(x -> sum(x .^ 2), [1.0, 1.0])
+stats = GenericExecutionStats(nlp)
+set_solver_specific!(stats, :isConvex, true)
+set_solver_specific!(stats, :inner_iterations, 7)
 
-solvers = Dict(:newton => newton)
-problems = [NLPModelsTest.BROWNDEN()]
-stats = bmark_solvers(solvers, problems)
-
-# Access the solver-specific column `:isConvex` for the `:newton` solver
-df_newton = stats[:newton]
-df_newton.isConvex
+stats.solver_specific
 ```
