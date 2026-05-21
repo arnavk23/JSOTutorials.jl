@@ -224,16 +224,22 @@ The tutorial covers how to use the problems from `OptimizationProblems` to run a
 
 ### Handling `solver_specific` in `stats`
 
-If a solver's `GenericExecutionStats` contains a `solver_specific` dictionary, then when `bmark_solvers` processes the results it creates a column in the per-solver `DataFrame` for each key in that dictionary. These columns can then be analyzed and compared alongside the standard metrics such as `status` and `elapsed_time`.
+If a solver's `GenericExecutionStats` contains a `solver_specific` dictionary, those values can be tabulated alongside the standard metrics such as `status` and `elapsed_time`.
 
-Here is an example showing how to set a solver-specific flag so that it appears as a column in the resulting stats table and can be used for tabulation:
+Here is an example showing how to populate `solver_specific` and place those fields in a stats table:
 ```julia
-using ADNLPModels, SolverCore
+using ADNLPModels, DataFrames, SolverCore
 
 nlp = ADNLPModel(x -> sum(x .^ 2), [1.0, 1.0])
-stats = GenericExecutionStats(nlp)
-set_solver_specific!(stats, :isConvex, true)
-set_solver_specific!(stats, :inner_iterations, 7)
+stats = SolverCore.GenericExecutionStats(nlp)
+SolverCore.set_solver_specific!(stats, :isConvex, true)
+SolverCore.set_solver_specific!(stats, :inner_iterations, 7)
 
-stats.solver_specific
+df = DataFrame(
+  solver = ["newton"],
+  status = [stats.status],
+  isConvex = [stats.solver_specific[:isConvex]],
+  inner_iterations = [stats.solver_specific[:inner_iterations]],
+)
+pretty_stats(stdout, df)
 ```
