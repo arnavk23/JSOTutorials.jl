@@ -228,18 +228,20 @@ If a solver's `GenericExecutionStats` contains a `solver_specific` dictionary, t
 
 Here is an example showing how to populate `solver_specific` and place those fields in a stats table:
 ```julia
-using ADNLPModels, DataFrames, SolverCore
+import NLPModels: reset!
+using NLPModelsTest, DataFrames, SolverCore, SolverBenchmark
 
-nlp = ADNLPModel(x -> sum(x .^ 2), [1.0, 1.0])
-stats = SolverCore.GenericExecutionStats(nlp)
-SolverCore.set_solver_specific!(stats, :isConvex, true)
-SolverCore.set_solver_specific!(stats, :inner_iterations, 7)
+function newton(nlp)
+  stats = GenericExecutionStats(nlp)
+  set_solver_specific!(stats, :isConvex, true)
+  return stats
+end
 
-df = DataFrame(
-  solver = ["newton"],
-  status = [stats.status],
-  isConvex = [stats.solver_specific[:isConvex]],
-  inner_iterations = [stats.solver_specific[:inner_iterations]],
-)
-pretty_stats(stdout, df)
+solvers = Dict(:newton => newton)
+problems = [NLPModelsTest.BROWNDEN()]
+stats = bmark_solvers(solvers, problems)
+
+# Access the solver-specific column `:isConvex` for the `:newton` solver
+df_newton = stats[:newton]
+df_newton.isConvex
 ```
