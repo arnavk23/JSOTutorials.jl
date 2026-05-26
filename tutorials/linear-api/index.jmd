@@ -50,7 +50,7 @@ Jtv = zeros(nlp.meta.nvar)
 J = jac_op!(nlp, x, Jv, Jtv) # returns a LinearOperator representing the Jacobian
 
 # Compare operator-based J*v with jprod!
-v = randn(nlp.meta.nvar)
+v = ones(nlp.meta.nvar)
 Jv_op = similar(Jv)
 mul!(Jv_op, J, v)               # operator-based product
 Jv_direct = zeros(nlp.meta.ncon)
@@ -59,7 +59,7 @@ jprod!(nlp, x, v, Jv_direct)    # direct Jacobian-vector product API
 println("||J*v (op) - J*v (jprod!)|| = ", norm(Jv_op - Jv_direct))
 
 # And similarly for J'*w
-w = randn(nlp.meta.ncon)
+w = ones(nlp.meta.ncon)
 Jt_w_op = zeros(nlp.meta.nvar)
 mul!(Jt_w_op, adjoint(J), w)
 Jt_w_direct = zeros(nlp.meta.nvar)
