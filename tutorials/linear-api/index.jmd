@@ -17,14 +17,16 @@ We demonstrate how to:
 
 ## Example using a test problem
 
-We use a problem from `NLPModelsTest` which may contain both linear and nonlinear constraints. The `NLPModelsTest` package exposes a collection of example problems useful for experimenting with the APIs.
+We use the `HS21` problem from `NLPModelsTest`, a standard constrained Hock--Schittkowski test problem. Choosing it by name keeps this tutorial stable across package versions and ensures the example exercises the constraint/Jacobian APIs that the linear API is designed to inspect.
 
 ```julia
 using NLPModelsTest, NLPModels, LinearOperators, LinearAlgebra
 
-# Load a test problem (choose one that has constraints)
-list = NLPModelsTest.nlp_problems
-nlp = eval(Symbol(list[7]))()
+# Load a specific constrained test problem by name instead of relying on
+# the ordering of `nlp_problems`, which can change across package versions.
+problem_name = "HS21"
+@assert problem_name in NLPModelsTest.nlp_problems "$(problem_name) is not available in NLPModelsTest.nlp_problems"
+nlp = getfield(NLPModelsTest, Symbol(problem_name))()
 
 # Point at which to evaluate
 x = nlp.meta.x0
