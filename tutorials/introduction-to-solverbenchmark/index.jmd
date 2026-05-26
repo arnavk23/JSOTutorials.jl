@@ -224,9 +224,9 @@ The tutorial covers how to use the problems from `OptimizationProblems` to run a
 
 ### Handling `solver_specific` in `stats`
 
-If a solver's `GenericExecutionStats` contains a `solver_specific` dictionary, those values can be tabulated alongside the standard metrics such as `status` and `elapsed_time`.
+If a solver's `GenericExecutionStats` contains a `solver_specific` dictionary, then when `bmark_solvers` processes the results it creates a column in the per-solver `DataFrame` for each key in that dictionary. These columns can then be analyzed and compared alongside the standard metrics such as `status` and `elapsed_time`.
 
-Here is an example showing how to populate `solver_specific` and place those fields in a stats table:
+Here is an example showing how to set a solver-specific flag so that it appears as a column in the resulting stats table and can be used for tabulation:
 ```julia
 import NLPModels: reset!
 using NLPModelsTest, DataFrames, SolverCore, SolverBenchmark
